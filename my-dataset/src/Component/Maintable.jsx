@@ -1,6 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import 'chart.js/auto'; // Import necessary for chart.js to work
+import 'chart.js/auto';
+import styled from 'styled-components';
+
+// Styled components
+const Container = styled.div`
+  padding: 20px;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  border: 2px solid lightgreen;
+`;
+
+const TableHeader = styled.th`
+  cursor: pointer;
+  padding: 10px;
+  background-color: lightgreen;
+  border: 1px solid #ddd;
+`;
+
+const TableRow = styled.tr`
+  &:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;
+
+const TableCell = styled.td`
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+`;
+
+const SubTitle = styled.h2`
+  text-align: center;
+  margin-bottom: 20px;
+`;
 
 const Maintable = () => {
   const [jobs, setJobs] = useState([]);
@@ -18,10 +63,8 @@ const Maintable = () => {
         return response.json();
       })
       .then(data => {
-        console.log("Fetched data:", data); // Debugging step
         if (data && Array.isArray(data)) {
           const processedData = processJobsData(data);
-          console.log("Processed data:", processedData); // Debugging step
           setJobs(processedData);
           setSortedJobs(processedData);
         } else {
@@ -34,12 +77,10 @@ const Maintable = () => {
   }, []);
 
   const processJobsData = (data) => {
-    console.log("Processing data:", data); // Debugging step
     const groupedByYear = data.reduce((acc, job) => {
       if (!acc[job.work_year]) {
         acc[job.work_year] = [];
       }
-      // Ensure salary_in_usd is a number and not zero
       const salary = parseFloat(job.salary_in_usd);
       if (!isNaN(salary) && salary > 0) {
         acc[job.work_year].push({ ...job, salary_in_usd: salary });
@@ -59,7 +100,6 @@ const Maintable = () => {
       };
     });
 
-    console.log("Processed job data:", processedData); // Debugging step
     return processedData;
   };
 
@@ -72,7 +112,6 @@ const Maintable = () => {
 
     const sortedArray = [...sortedJobs].sort((a, b) => {
       if (key === 'averageSalary') {
-        // Parse average salary to float for comparison
         const aVal = parseFloat(a[key]);
         const bVal = parseFloat(b[key]);
         if (aVal < bVal) {
@@ -135,50 +174,65 @@ const Maintable = () => {
     ],
   };
 
+  const getSortSymbol = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? '↑' : '↓';
+    }
+    return '';
+  };
+
   return (
-    <div>
-      <h1>Main Table</h1>
-      <Line data={lineGraphData} />
-      <table>
+    <Container>
+      <Title>Main Table</Title>
+      
+      <Table>
         <thead>
           <tr>
-            <th onClick={() => handleSort('year')}>Year {sortConfig.key === 'year' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}</th>
-            <th onClick={() => handleSort('totalJobs')}>Number of Jobs {sortConfig.key === 'totalJobs' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}</th>
-            <th onClick={() => handleSort('averageSalary')}>Average Salary (USD) {sortConfig.key === 'averageSalary' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}</th>
+            <TableHeader onClick={() => handleSort('year')}>
+              Year {getSortSymbol('year')}
+            </TableHeader>
+            <TableHeader onClick={() => handleSort('totalJobs')}>
+              Number of Jobs {getSortSymbol('totalJobs')}
+            </TableHeader>
+            <TableHeader onClick={() => handleSort('averageSalary')}>
+              Average Salary (USD) {getSortSymbol('averageSalary')}
+            </TableHeader>
           </tr>
         </thead>
         <tbody>
           {sortedJobs.map((job, index) => (
-            <tr key={index} onClick={() => handleRowClick(job.year)}>
-              <td>{job.year}</td>
-              <td>{job.totalJobs}</td>
-              <td>{job.averageSalary}</td>
-            </tr>
+            <TableRow key={index} onClick={() => handleRowClick(job.year)}>
+              <TableCell>{job.year}</TableCell>
+              <TableCell>{job.totalJobs}</TableCell>
+              <TableCell>{job.averageSalary}</TableCell>
+            </TableRow>
           ))}
         </tbody>
-      </table>
+      </Table>
+      <h2>Line Graph</h2>
+      <Line data={lineGraphData} />
       {selectedYear && (
         <div>
-          <h2>Job Titles for {selectedYear}</h2>
-          <table>
+          <SubTitle>Job Titles for {selectedYear}</SubTitle>
+          <Table>
             <thead>
               <tr>
-                <th>Job Title</th>
-                <th>Count</th>
+                <TableHeader>Job Title</TableHeader>
+                <TableHeader>No. Of Jobs</TableHeader>
               </tr>
             </thead>
             <tbody>
               {jobTitles.map((job, index) => (
-                <tr key={index}>
-                  <td>{job.title}</td>
-                  <td>{job.count}</td>
-                </tr>
+                <TableRow key={index}>
+                  <TableCell>{job.title}</TableCell>
+                  <TableCell>{job.count}</TableCell>
+                </TableRow>
               ))}
             </tbody>
-          </table>
+          </Table>
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 
