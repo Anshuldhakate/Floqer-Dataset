@@ -6,30 +6,56 @@ import styled from 'styled-components';
 // Styled components
 const Container = styled.div`
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const Title = styled.h1`
   text-align: center;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+`;
+
+const TableWrapper = styled.div`
+  width: 100%;
+  overflow-x: auto;
   margin-bottom: 20px;
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
-  border: 2px solid lightgreen;
+  min-width: 600px;
+  border: 2px solid lightteal;
+
+  @media (max-width: 768px) {
+    min-width: 100%;
+  }
 `;
 
 const TableHeader = styled.th`
   cursor: pointer;
   padding: 10px;
   background-color: lightgreen;
-  border: 1px solid #ddd;
+  border: 2px solid lightgreen;
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
 `;
 
 const TableRow = styled.tr`
   &:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #e7f4e7;
   }
   &:hover {
     background-color: #f1f1f1;
@@ -40,11 +66,31 @@ const TableCell = styled.td`
   padding: 10px;
   border: 1px solid #ddd;
   text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
 `;
 
 const SubTitle = styled.h2`
   text-align: center;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
+const GraphWrapper = styled.div`
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 20px;
+ 
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 `;
 
 const Maintable = () => {
@@ -185,51 +231,58 @@ const Maintable = () => {
     <Container>
       <Title>Main Table</Title>
       
-      <Table>
-        <thead>
-          <tr>
-            <TableHeader onClick={() => handleSort('year')}>
-              Year {getSortSymbol('year')}
-            </TableHeader>
-            <TableHeader onClick={() => handleSort('totalJobs')}>
-              Number of Jobs {getSortSymbol('totalJobs')}
-            </TableHeader>
-            <TableHeader onClick={() => handleSort('averageSalary')}>
-              Average Salary (USD) {getSortSymbol('averageSalary')}
-            </TableHeader>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedJobs.map((job, index) => (
-            <TableRow key={index} onClick={() => handleRowClick(job.year)}>
-              <TableCell>{job.year}</TableCell>
-              <TableCell>{job.totalJobs}</TableCell>
-              <TableCell>{job.averageSalary}</TableCell>
-            </TableRow>
-          ))}
-        </tbody>
-      </Table>
-      <h2>Line Graph</h2>
-      <Line data={lineGraphData} />
+      <TableWrapper>
+        <Table>
+          <thead>
+            <tr>
+              <TableHeader onClick={() => handleSort('year')}>
+                Year {getSortSymbol('year')}
+              </TableHeader>
+              <TableHeader onClick={() => handleSort('totalJobs')}>
+                Number of Jobs {getSortSymbol('totalJobs')}
+              </TableHeader>
+              <TableHeader onClick={() => handleSort('averageSalary')}>
+                Average Salary (USD) {getSortSymbol('averageSalary')}
+              </TableHeader>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedJobs.map((job, index) => (
+              <TableRow key={index} onClick={() => handleRowClick(job.year)}>
+                <TableCell>{job.year}</TableCell>
+                <TableCell>{job.totalJobs}</TableCell>
+                <TableCell>{job.averageSalary}</TableCell>
+              </TableRow>
+            ))}
+          </tbody>
+        </Table>
+      </TableWrapper>
+
+      <GraphWrapper>
+        <Line data={lineGraphData} />
+      </GraphWrapper>
+      
       {selectedYear && (
         <div>
           <SubTitle>Job Titles for {selectedYear}</SubTitle>
-          <Table>
-            <thead>
-              <tr>
-                <TableHeader>Job Title</TableHeader>
-                <TableHeader>No. Of Jobs</TableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {jobTitles.map((job, index) => (
-                <TableRow key={index}>
-                  <TableCell>{job.title}</TableCell>
-                  <TableCell>{job.count}</TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
+          <TableWrapper>
+            <Table>
+              <thead>
+                <tr>
+                  <TableHeader>Job Title</TableHeader>
+                  <TableHeader>No. Of Jobs</TableHeader>
+                </tr>
+              </thead>
+              <tbody>
+                {jobTitles.map((job, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{job.title}</TableCell>
+                    <TableCell>{job.count}</TableCell>
+                  </TableRow>
+                ))}
+              </tbody>
+            </Table>
+          </TableWrapper>
         </div>
       )}
     </Container>
